@@ -21,28 +21,24 @@ expressions below? Test your solution by uncommenting the examples
 error is generated.
 ......................................................................*)
 
-(*   <--- remove this start of comment line
-
-let exercise1a : ??? =
+let exercise1a : float * string =
   (0.1, "hi") ;;
 
-let exercise1b : ??? =
+let exercise1b : string list =
   let add_to_hello_list x = ["Hello"; x]
   in add_to_hello_list "World!";;
 
-let exercise1c : ???  =
+let exercise1c : int * float -> int  =
   fun (x, y) -> x + int_of_float y ;;
 
-let exercise1d : ??? =
+let exercise1d : int list -> bool  =
   fun lst ->
     match lst with
     | [] -> false
     | hd :: _ -> hd < hd + 1 ;;
 
-let exercise1e : ??? =
+let exercise1e : bool -> bool list =
   fun x -> if x then [x] else [] ;;
-
-remove this end of comment line too ----> *)
 
 (*======================================================================
 Part 2: First-order functional programming with lists
@@ -80,19 +76,29 @@ comprehensive. You may want to add some tests for other functions in
 the lab to get some practice with automated unit testing.
 ......................................................................*)
 
-let square_all (lst : int list) : int list =
-  failwith "square_all not implemented" ;;
+let exercise1d : int list -> bool  =
+  fun lst ->
+    match lst with
+    | [] -> false
+    | hd :: _ -> hd < hd + 1 ;;
 
-let exercise2 = [] ;;
+let square_all : int list -> int list =
+  List.map (fun x -> x * x) ;;
+
+let exercise2 = square_all [-2; 4];;
 
 (*......................................................................
 Exercise 3: Define a recursive function that sums an integer
 list. (What's a sensible return value for the empty list?)
 ......................................................................*)
 
-let sum (lst : int list) : int =
-  failwith "sum not implemented" ;;
+let rec sum (lst : int list) : int =
+  match lst with
+  |[] -> 0
+  | hd :: [] -> hd
+  | hd :: nk :: tl -> sum (hd + nk :: tl);;
 
+let exercise3 = sum [1;2;3;5];;
 (*......................................................................
 Exercise 4: Define a recursive function that returns the maximum
 element in a non-empty integer list. Don't worry what happens on an empty
@@ -100,8 +106,14 @@ list. You may be warned by the compiler that "this pattern-matching is
 not exhaustive." You may ignore this warning for this lab.
 ......................................................................*)
 
-let max_list (lst : int list) : int =
-  failwith "max_list not implemented" ;;
+let rec max_list (lst : int list) : int =
+  match lst with
+  |[] -> 0
+  | hd :: [] -> hd
+  | hd :: nt :: tl -> if nt > hd then max_list (nt :: tl)
+    else max_list(hd :: tl);;
+
+let exercise4 = max_list [-1;2;3;-5];;
 
 (*......................................................................
 Exercise 5: Define a function zip, that takes two int lists and
@@ -120,8 +132,13 @@ length lists, to just pad the shorter list with, say, false values, so
 that, zip [1] [2; 3; 4] = [(1, 2); (false, 3); (false, 4)]?
 ......................................................................*)
 
-let zip (x : int list) (y : int list) : (int * int) list =
-  failwith "zip not implemented" ;;
+let rec zip (x : int list) (y : int list) : (int * int) list =
+  match x with
+  | hdx :: tlx -> (match y with
+    |hdy :: tly -> (hdx, hdy) :: zip tlx tly)
+  | [] -> [];;
+
+let exercise5 = zip [1; 2; 3] [4; 5; 6];;
 
 (*......................................................................
 Exercise 6: Recall from Chapter 7 the definition of the function prods
@@ -152,7 +169,9 @@ let rec prods (lst : (int * int) list) : int list =
   | (x, y) :: tail -> (x * y) :: (prods tail) ;;
 
 let dotprod (a : int list) (b : int list) : int =
-  failwith "dotprod not implemented" ;;
+  sum (prods (zip a b));;
+
+let exercise6 = dotprod [1; 2] [5; 10] ;;
 
 (*======================================================================
 Part 3: High-order functional programming with map, filter, and fold
@@ -209,15 +228,20 @@ Exercise 7: Reimplement sum using fold_left, naming it sum_ho (for
 "higher order").
 ......................................................................*)
 
-let sum_ho (lst : int list) : int =
-  failwith "sum_ho not implemented" ;;
+open List ;;
 
+let sum_ho (lst : int list) : int =
+  List.fold_left (+) 0 lst;;
+
+let exercise7 = sum_ho [1;2;3];;
 (*......................................................................
 Exercise 8: Reimplement prods using map.
 ......................................................................*)
 
 let prods_ho (lst : (int * int) list) : int list =
-  failwith "prods_ho not implemented" ;;
+  List.map (fun(a,b) -> (a*b)) lst;;
+
+let exercise8 = prods_ho [(1, 4); (2, 5); (3, 6)];;
 
 (*......................................................................
 Exercise 9: The OCaml List module provides -- in addition to the map,
@@ -231,7 +255,9 @@ map2 to reimplement zip.
 ......................................................................*)
 
 let zip_ho (x : int list) (y : int list) : (int * int) list =
-  failwith "sum_ho not implemented" ;;
+  List.map2 (fun a b -> (a,b)) x y;;
+
+let exercise9 = zip_ho [1; 2; 3] [4; 5; 6];;
 
 (*......................................................................
 Exercise 10: Define a function evens, using these higher-order
@@ -240,4 +266,6 @@ even numbers in its argument list.
 ......................................................................*)
 
 let evens : int list -> int list =
-  fun _ -> failwith "evens not implemented" ;;
+  List.filter (fun a -> a mod 2 = 0);;
+
+let exercise10 = evens [1;2;3;4;5;6];;
